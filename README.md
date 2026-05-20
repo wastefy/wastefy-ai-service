@@ -1,0 +1,1 @@
+"# wastefy-ai-service" 
