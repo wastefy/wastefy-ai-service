@@ -1,0 +1,100 @@
+{
+  "model_name": "MLP_SisaHari",
+  "deskripsi": "Model deep learning untuk memprediksi sisa hari buah dan sayur sebelum membusuk",
+
+  "fitur_input": [
+    "nama_item",
+    "jenis_item",
+    "lokasi_penyimpanan",
+    "hari_sejak_pembelian",
+    "label"
+  ],
+
+  "fitur_kategorikal": [
+    "nama_item",
+    "jenis_item",
+    "lokasi_penyimpanan",
+    "label"
+  ],
+
+  "fitur_numerikal": ["hari_sejak_pembelian"],
+
+  "encoding": "LabelEncoder (per kolom kategorikal)",
+  "scaling": "StandardScaler (pada hari_sejak_pembelian)",
+
+  "kategori": {
+    "nama_item": {
+      "Buah": ["Apel", "Mangga", "Pisang", "Melon", "Jeruk"],
+      "Sayur": ["Wortel", "Kentang", "Cabe", "Timun", "Tomat"]
+    },
+    "jenis_item": ["Buah", "Sayur"],
+    "lokasi_penyimpanan": ["suhu ruang", "pendingin", "pembeku"],
+    "label": {
+      "Buah": ["Mentah", "Matang", "Terlalu Matang", "Busuk"],
+      "Sayur": ["Segar", "Busuk"]
+    }
+  },
+
+  "batas_hari_sejak_pembelian": {
+    "Mentah": 7,
+    "Matang": 5,
+    "Terlalu Matang": 3,
+    "Busuk": 1,
+    "Segar": 7
+  },
+
+  "target": {
+    "kolom": "sisa_hari",
+    "tipe": "integer",
+    "satuan": "hari",
+    "minimum": 0
+  },
+
+  "arsitektur": {
+    "tipe": "MLP (Multi-Layer Perceptron)",
+    "input_dim": 5,
+    "hidden_layers": [
+      {
+        "units": 128,
+        "aktivasi": "relu",
+        "dropout": 0.3,
+        "batch_norm": true,
+        "l2": 0.0001
+      },
+      {
+        "units": 64,
+        "aktivasi": "relu",
+        "dropout": 0.2,
+        "batch_norm": true,
+        "l2": 0.0001
+      },
+      {
+        "units": 32,
+        "aktivasi": "relu",
+        "dropout": 0.1,
+        "batch_norm": true,
+        "l2": 0.0001
+      }
+    ],
+    "output_layer": { "units": 1, "aktivasi": "linear" },
+    "loss": "mae",
+    "optimizer": "Adam",
+    "learning_rate": 0.001
+  },
+
+  "training": {
+    "total_data": 4462,
+    "split": { "train": "70%", "val": "15%", "test": "15%" },
+    "epochs_max": 200,
+    "batch_size": 32,
+    "early_stopping": { "monitor": "val_loss", "patience": 20 },
+    "reduce_lr": { "monitor": "val_loss", "factor": 0.5, "patience": 8 }
+  },
+
+  "metrik_evaluasi": {
+    "MAE": null,
+    "RMSE": null,
+    "R2": null,
+    "catatan": "Isi nilai ini setelah training selesai dari hasil cell Evaluasi"
+  }
+}

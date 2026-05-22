@@ -1,0 +1,13 @@
+# dataset
+dataset.csv
+dataset.xlsx
+dataset_penyimpanan_item.csv
+sayur_buah_clean_v3.csv
+
+# model 
+Model.ipynb
+Konversi.ipynb
+
+# folder 
+.ipynb_checkpoints/
+model_output/
