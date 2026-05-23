@@ -13,7 +13,7 @@ model/vision/
 ├── model.keras                 ← Model Keras
 ├── README.md                   ← Dokumentasi
 ├── requirements.txt            ← Daftar dependensi
-└── vision_model.ipynb         ← Notebook
+└── vision_model.ipynb          ← Notebook
 ```
 
 ---
