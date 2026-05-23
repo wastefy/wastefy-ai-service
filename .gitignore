@@ -1,13 +1,21 @@
 # dataset
-dataset.csv
-dataset.xlsx
-dataset_penyimpanan_item.csv
-sayur_buah_clean_v3.csv
+dataset/
 
 # model 
 Model.ipynb
 Konversi.ipynb
+cek_dataset.ipynb
+inference.ipynb
+
+# other file
+main.py
+inference.py
+test_api.py
+api_simple.py
+test_fastapi.py
 
 # folder 
 .ipynb_checkpoints/
 model_output/
+__pycache__/
+.vscode/
