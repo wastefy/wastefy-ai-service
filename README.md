@@ -1,6 +1,6 @@
-# 🥦 Vision Model — Klasifikasi Kesegaran Sayur & Buah
+# Vision Model — Klasifikasi Kondisi Fisik Sayur & Buah
 
-Modul FastAPI untuk mengklasifikasikan kesegaran sayur dan buah menggunakan model **MobileNetV2** yang dilatih dengan Transfer Learning (Feature Extraction).
+Modul FastAPI untuk mengklasifikasikan kondisi fisik sayur dan buah menggunakan model **MobileNetV2** yang dilatih dengan Transfer Learning (Feature Extraction).
 
 ---
 
@@ -8,11 +8,12 @@ Modul FastAPI untuk mengklasifikasikan kesegaran sayur dan buah menggunakan mode
 
 ```
 model/vision/
-├── api_vision.py               ← Router FastAPI (file ini)
-├── sayur_buah_classifier.keras ← Model Keras (download dari Google Colab)
+├── api_vision.py               ← Router FastAPI 
 ├── model_metadata.json         ← Metadata kelas & threshold
-├── requirements.txt
-└── README.md
+├── model.keras                 ← Model Keras
+├── README.md                   ← Dokumentasi
+├── requirements.txt            ← Daftar dependensi
+└── vision_model.ipynb         ← Notebook
 ```
 
 ---
@@ -25,7 +26,7 @@ model/vision/
 | Input            | 224 × 224 × 3                               |
 | Jumlah kelas     | 30                                          |
 | Dataset (total)  | 68.752 gambar (24.242 dipakai setelah undersampling cap 1.500/kelas) |
-| Item             | apple, banana, carrot, orange, tomat, cabe, timun, potato, grape, mango |
+| Item             | Apel, Pisang, Mangga, Jeruk, Wortel, Kentang, Cabai, Anggur, Mentimun, Tomat |
 | Fase training    | Feature Extraction (1 fase)                 |
 | Augmentasi       | On-the-fly (flip, crop, brightness, dll.)   |
 
@@ -44,7 +45,7 @@ Format internal label: `nama_item||jenis_item||kondisi_fisik`
 
 ### `POST /predict/vision`
 
-Menerima gambar dan mengembalikan klasifikasi kesegaran.
+Menerima gambar dan mengembalikan klasifikasi kondisi fisik.
 
 **Request:**
 
@@ -58,7 +59,7 @@ file_foto: <file gambar JPG/PNG>
 ```json
 {
   "out_of_scope"  : false,
-  "nama_item"     : "apple",
+  "nama_item"     : "Apel",
   "jenis_item"    : "Buah",
   "kondisi_fisik" : "Matang",
   "confidence"    : 0.9431
@@ -70,8 +71,10 @@ file_foto: <file gambar JPG/PNG>
 ```json
 {
   "out_of_scope" : true,
-  "confidence"   : 0.1823,
-  "pesan"        : "Gambar tidak dikenali sebagai sayur atau buah yang diketahui."
+  "nama_item"    : null,
+  "jenis_item"   : null,
+  "kondisi_fisik": null,
+  "confidence"   : 0.1823
 }
 ```
 
@@ -91,7 +94,7 @@ File berikut sudah di-commit ke repo dan harus ada di folder yang sama:
 
 | File                            | Keterangan                         |
 |---------------------------------|------------------------------------|
-| `sayur_buah_classifier.keras`   | Bobot model Keras (13 MB)         |
+| `model.keras`   | Bobot model Keras (13 MB)         |
 | `model_metadata.json`           | Nama kelas & nilai threshold       |
 
 ### 3. Daftarkan router di `main.py`
@@ -111,7 +114,7 @@ uvicorn main:app --reload
 ### 5. Uji endpoint
 
 ```bash
-curl -X POST "http://localhost:8000/vision/predict" \
+curl -X POST "http://localhost:8000/predict/vision" \
      -F "file_foto=@contoh_apel.jpg"
 ```
 
@@ -123,8 +126,8 @@ Model dilengkapi dua mekanisme untuk menolak gambar di luar dataset:
 
 | Mekanisme           | Nilai default | Keterangan                                      |
 |---------------------|---------------|-------------------------------------------------|
-| Confidence threshold | 0.60          | Tolak jika skor tertinggi < threshold           |
-| Entropy threshold    | 2.80          | Tolak jika distribusi probabilitas terlalu merata |
+| Confidence threshold | 0.60         | Tolak jika skor tertinggi < threshold           |
+| Entropy threshold    | 1.134        | Tolak jika distribusi probabilitas terlalu merata |
 
 Nilai ini tersimpan di `model_metadata.json` dan dibaca otomatis saat startup.
 
@@ -132,4 +135,4 @@ Nilai ini tersimpan di `model_metadata.json` dan dibaca otomatis saat startup.
 
 ## Training
 
-Notebook pelatihan lengkap: [`sayur_buah_classifier.ipynb`](../../notebooks/sayur_buah_classifier.ipynb)
+Notebook pelatihan lengkap: [`vision_model.ipynb`](vision_model.ipynb)

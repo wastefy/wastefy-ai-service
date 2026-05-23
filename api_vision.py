@@ -1,103 +1,108 @@
 from fastapi import APIRouter, UploadFile, File
+from pydantic import BaseModel
+from typing import Optional, Union
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
 import json
 import os
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from tensorflow.keras.preprocessing.image import img_to_array
 
 router = APIRouter(prefix="/predict", tags=["Vision Model"])
 
-# Load model & metadata
+# 1. Definisi Pydantic Model (Output Schema)
+class OutputVision(BaseModel):
+    out_of_scope: bool
+    nama_item: Optional[str] = None
+    jenis_item: Optional[str] = None
+    kondisi_fisik: Optional[str] = None
+    confidence: float
+
+# Buat schema khusus untuk error
+class ErrorResponse(BaseModel):
+    error: str
+
+# 2. Load model & metadata
 BASE_DIR = os.path.dirname(__file__)
+MODEL_PATH = os.path.join(BASE_DIR, "model.keras")
+METADATA_PATH = os.path.join(BASE_DIR, "model_metadata.json")
 
 try:
-    model = tf.keras.models.load_model(
-        os.path.join(BASE_DIR, "sayur_buah_classifier.keras")
-    )
-except Exception:
+    model = tf.keras.models.load_model(MODEL_PATH)
+except Exception as e:
     model = None
 
 try:
-    with open(os.path.join(BASE_DIR, "model_metadata.json"), encoding="utf-8") as f:
+    with open(METADATA_PATH, encoding="utf-8") as f:
         metadata = json.load(f)
-    CLASS_NAMES          = metadata["class_names"]
+    CLASS_NAMES = metadata["class_names"]
     CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.60)
-    ENTROPY_THRESHOLD    = metadata.get("entropy_threshold", 2.80)
+    ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 1.134)
 except Exception:
-    CLASS_NAMES          = []
+    CLASS_NAMES = []
     CONFIDENCE_THRESHOLD = 0.60
-    ENTROPY_THRESHOLD    = 2.80
+    ENTROPY_THRESHOLD = 1.134
 
 IMG_SIZE = 224
 
-
-# Helper 
+# 3. Helper Functions
 def compute_entropy(probs: np.ndarray) -> float:
     probs = np.clip(probs, 1e-9, 1.0)
     return float(-np.sum(probs * np.log(probs)))
 
-
 def is_out_of_scope(probs: np.ndarray) -> bool:
     confidence = float(np.max(probs))
-    entropy    = compute_entropy(probs)
+    entropy = compute_entropy(probs)
     return confidence < CONFIDENCE_THRESHOLD or entropy > ENTROPY_THRESHOLD
 
-
-# Endpoint
-@router.post("/vision")
+# 4. Endpoint 
+# bisa merespons OutputVision ATAU ErrorResponse
+@router.post("/vision", response_model=Union[OutputVision, ErrorResponse])
 async def prediksi_gambar(file_foto: UploadFile = File(...)):
-    """
-    Klasifikasi kesegaran sayur & buah.
-
-    Returns:
-        out_of_scope  : true jika gambar di luar dataset yang dikenal
-        nama_item     : nama item (misal 'apple', 'tomat')
-        jenis_item    : 'Buah' atau 'Sayur'
-        kondisi_fisik : 'Mentah' | 'Matang' | 'Terlalu Matang' | 'Busuk' | 'Segar'
-        confidence    : skor kepercayaan model (0.0 – 1.0)
-    """
+    # Kirimkan pesan error menggunakan ErrorResponse
     if model is None:
-        return {"error": "Model tidak ditemukan. Pastikan 'sayur_buah_classifier.keras' ada di direktori yang sama."}
-
+        return ErrorResponse(error="Model tidak ditemukan di server.")
     if not CLASS_NAMES:
-        return {"error": "Metadata kelas tidak ditemukan. Pastikan 'model_metadata.json' tersedia."}
+        return ErrorResponse(error="Metadata model rusak atau hilang.")
+    
+    # Validasi tipe file
+    if file_foto.content_type not in ["image/jpeg", "image/png"]:
+        return ErrorResponse(error="Hanya mendukung file JPEG atau PNG.")
 
     try:
-        contents  = await file_foto.read()
-        img       = Image.open(io.BytesIO(contents)).convert("RGB")
-        img       = img.resize((IMG_SIZE, IMG_SIZE))
+        contents = await file_foto.read()
+        img = Image.open(io.BytesIO(contents)).convert("RGB")
+        img = img.resize((IMG_SIZE, IMG_SIZE))
 
-        img_array = tf.keras.utils.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = preprocess_input(img_array)
+        img_arr = img_to_array(img) / 255.0
+        img_arr = np.expand_dims(img_arr, axis=0)
 
-        predictions = model.predict(img_array, verbose=0)[0]
-        confidence  = float(np.max(predictions))
+        predictions = model.predict(img_arr, verbose=0)[0]
+        confidence = float(np.max(predictions))
 
-        # Out-of-scope detection
+        # Deteksi Out-of-scope 
         if is_out_of_scope(predictions):
-            return {
-                "out_of_scope" : True,
-                "confidence"   : round(confidence, 4),
-                "pesan"        : "Gambar tidak dikenali sebagai sayur atau buah yang diketahui.",
-            }
+            return OutputVision(
+                out_of_scope=True,
+                nama_item=None,
+                jenis_item=None,
+                kondisi_fisik=None,
+                confidence=round(confidence, 4)
+            )
 
-        predicted_idx   = int(np.argmax(predictions))
+        # Proses Label
+        predicted_idx = int(np.argmax(predictions))
         predicted_label = CLASS_NAMES[predicted_idx]
-
-        # Format label: "nama_item||jenis_item||kondisi_fisik"
         parts = predicted_label.split("||")
-        nama_item, jenis_item, kondisi_fisik = parts[0], parts[1], parts[2]
-
-        return {
-            "out_of_scope" : False,
-            "nama_item"    : nama_item,
-            "jenis_item"   : jenis_item,
-            "kondisi_fisik": kondisi_fisik,
-            "confidence"   : round(confidence, 4),
-        }
+        
+        return OutputVision(
+            out_of_scope=False,
+            nama_item=parts[0],
+            jenis_item=parts[1],
+            kondisi_fisik=parts[2],
+            confidence=round(confidence, 4)
+        )
 
     except Exception as e:
-        return {"error": str(e)}
+        return ErrorResponse(error=f"Terjadi kesalahan saat memproses gambar: {str(e)}")
