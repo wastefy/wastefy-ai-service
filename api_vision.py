@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Response
 from pydantic import BaseModel
 from typing import Optional, Union
 import tensorflow as tf
@@ -28,21 +28,20 @@ BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, "model.keras")
 METADATA_PATH = os.path.join(BASE_DIR, "model_metadata.json")
 
-try:
-    model = tf.keras.models.load_model(MODEL_PATH)
-except Exception as e:
-    model = None
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"File model tidak ditemukan: {MODEL_PATH}")
 
-try:
-    with open(METADATA_PATH, encoding="utf-8") as f:
-        metadata = json.load(f)
-    CLASS_NAMES = metadata["class_names"]
-    CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.60)
-    ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 1.134)
-except Exception:
-    CLASS_NAMES = []
-    CONFIDENCE_THRESHOLD = 0.60
-    ENTROPY_THRESHOLD = 1.134
+if not os.path.exists(METADATA_PATH):
+    raise FileNotFoundError(f"File metadata tidak ditemukan: {METADATA_PATH}")
+
+model = tf.keras.models.load_model(MODEL_PATH)
+
+with open(METADATA_PATH, encoding="utf-8") as f:
+    metadata = json.load(f)
+
+CLASS_NAMES = metadata["class_names"]
+CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.6)
+ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 1.134)
 
 IMG_SIZE = 224
 
@@ -59,15 +58,9 @@ def is_out_of_scope(probs: np.ndarray) -> bool:
 # 4. Endpoint 
 # bisa merespons OutputVision ATAU ErrorResponse
 @router.post("/vision", response_model=Union[OutputVision, ErrorResponse])
-async def prediksi_gambar(file_foto: UploadFile = File(...)):
-    # Kirimkan pesan error menggunakan ErrorResponse
-    if model is None:
-        return ErrorResponse(error="Model tidak ditemukan di server.")
-    if not CLASS_NAMES:
-        return ErrorResponse(error="Metadata model rusak atau hilang.")
-    
-    # Validasi tipe file
+async def prediksi_gambar(response: Response, file_foto: UploadFile = File(...)):
     if file_foto.content_type not in ["image/jpeg", "image/png"]:
+        response.status_code = 400
         return ErrorResponse(error="Hanya mendukung file JPEG atau PNG.")
 
     try:
@@ -95,7 +88,7 @@ async def prediksi_gambar(file_foto: UploadFile = File(...)):
         predicted_idx = int(np.argmax(predictions))
         predicted_label = CLASS_NAMES[predicted_idx]
         parts = predicted_label.split("||")
-        
+
         return OutputVision(
             out_of_scope=False,
             nama_item=parts[0],
@@ -105,4 +98,5 @@ async def prediksi_gambar(file_foto: UploadFile = File(...)):
         )
 
     except Exception as e:
+        response.status_code = 500
         return ErrorResponse(error=f"Terjadi kesalahan saat memproses gambar: {str(e)}")
