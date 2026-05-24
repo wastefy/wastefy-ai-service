@@ -1,4 +1,4 @@
-# GENAI — Panduan Penyimpanan Bahan Baku via Gemini AI
+# GENAI (Panduan Penyimpanan Bahan Baku via Gemini AI)
 
 Modul FastAPI untuk menghasilkan panduan penyimpanan bahan baku dapur katering secara otomatis menggunakan Google Gemini AI.
 

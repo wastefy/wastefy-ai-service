@@ -22,11 +22,11 @@ VALID_KONDISI = ["Busuk", "Matang", "Mentah", "Terlalu Matang", "Segar"]
 VALID_LOKASI = ["Suhu Ruang", "Pendingin", "Pembeku"]
 
 class DataBahanBaku(BaseModel):
-    nama_item: str
-    jenis_item: str
-    kondisi_fisik: str
-    lokasi_penyimpanan: str
-    sisa_hari: int = Field(..., ge=0, le=40)
+    nama_item: str = Field(..., description="Nama item: Anggur, Apel, Cabai, Jeruk, Kentang, Mangga, Mentimun, Pisang, Tomat, Wortel")
+    jenis_item: str = Field(..., description="Jenis item: Buah, Sayur")
+    kondisi_fisik: str = Field(..., description="Kondisi fisik: Busuk, Matang, Mentah, Terlalu Matang, Segar")
+    lokasi_penyimpanan: str = Field(..., description="Lokasi penyimpanan: Suhu Ruang, Pendingin, Pembeku")
+    sisa_hari: int = Field(..., ge=0, le=40, description="Sisa hari penyimpanan (0–40 hari)")
 
     @field_validator('nama_item')
     @classmethod
@@ -74,7 +74,7 @@ GENAI_RESPONSES = {
             "application/json": {
                 "example": {
                     "code": 200,
-                    "data": {"cara_simpan": "Simpan di suhu ruang dan hindari sinar matahari langsung..."},
+                    "data": {"cara_simpan": "- Tindakan Prioritas: Segera pindah ke tempat sejuk...\n- Cara Simpan: Simpan dalam wadah tertutup rapat...\n- Tips Tambahan: Pisahkan dari bahan berbau kuat..."},
                     "message": "Panduan berhasil dibuat",
                     "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
                     "status": "success"
@@ -104,7 +104,7 @@ GENAI_RESPONSES = {
             "application/json": {
                 "example": {
                     "code": 422,
-                    "errors": [{"error_code": "validation_error", "message": "Item tidak dikenal."}],
+                    "errors": [{"error_code": "validation_error", "message": "Value error, Jenis harus: Buah, Sayur"}],
                     "message": "Data tidak dapat diproses",
                     "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
                     "status": "error"
