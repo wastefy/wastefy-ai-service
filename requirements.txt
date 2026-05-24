@@ -1,3 +1,10 @@
-pydantic>=2.0
-pydantic-settings>=2.0
 fastapi
+uvicorn
+pydantic
+pydantic-settings
+python-dotenv
+google-genai
+tensorflow
+pillow
+numpy
+python-multipart

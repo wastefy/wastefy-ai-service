@@ -10,7 +10,7 @@ Tiga file ini adalah **fondasi bersama** yang digunakan oleh seluruh modul API (
 model/
 ├── config.py       ← Manajemen environment variable & konfigurasi aplikasi
 ├── utils.py        ← Dependency autentikasi & helper waktu
-└── schemas.py      ← Skema input/output Pydantic yang dipakai bersama
+└── schemas.py      ← Skema output Pydantic yang dipakai bersama
 ```
 
 ---
@@ -24,7 +24,7 @@ Membaca dan memvalidasi environment variable dari file `.env` menggunakan `pydan
 | Variabel | Keterangan |
 |---|---|
 | `GEMINI_API_KEY` | API Key untuk Google Gemini (dipakai modul GenAI) |
-| `VISION_API_KEY` | API Key untuk proteksi endpoint Vision & GenAI |
+| `VISION_API_KEY` | API Key untuk proteksi endpoint |
 
 ### Penggunaan
 
@@ -74,27 +74,11 @@ async def my_endpoint():
 
 ---
 
-## 📄 `schemas.py` (Skema Input & Output)
+## `schemas.py` (Skema Output Bersama)
 
-Mendefinisikan seluruh model Pydantic yang dipakai bersama antar modul. Terbagi menjadi dua kelompok besar: **Input** dan **Output**.
-
-### Input Schemas
-
-#### `DataBahanBaku`
-
-Dipakai oleh endpoint `POST /predict/genai`. Semua field divalidasi ketat — nilai di luar daftar berikut akan ditolak dengan error 422.
-
-| Field | Tipe | Nilai Valid |
-|---|---|---|
-| `nama_item` | `str` | `Anggur`, `Apel`, `Cabai`, `Jeruk`, `Kentang`, `Mangga`, `Mentimun`, `Pisang`, `Tomat`, `Wortel` |
-| `jenis_item` | `str` | `Buah`, `Sayur` |
-| `kondisi_fisik` | `str` | `Busuk`, `Matang`, `Mentah`, `Terlalu Matang`, `Segar` |
-| `lokasi_penyimpanan` | `str` | `Suhu Ruang`, `Pendingin`, `Pembeku` |
-| `sisa_hari` | `int` | `0` s/d `365` |
+Mendefinisikan model Pydantic untuk envelope respons yang dipakai seragam di seluruh modul. Schema input yang spesifik per modul (seperti `DataBahanBaku`) didefinisikan di file API masing-masing.
 
 ### Output Schemas
-
-Semua endpoint menggunakan envelope respons yang seragam.
 
 #### `SuccessResponse[T]` — HTTP 200
 
@@ -114,7 +98,11 @@ Generic schema untuk respons sukses. `T` diisi dengan tipe data spesifik tiap mo
 }
 ```
 
+> Field `meta.model` hanya diisi untuk endpoint yang menggunakan model lokal (contoh: Vision). Untuk endpoint lain nilainya `null`.
+
 #### `ErrorResponseWrapper` — HTTP 4xx / 5xx
+
+Dipakai untuk semua respons error termasuk 401, 422, dan 500.
 
 ```json
 {
@@ -129,16 +117,9 @@ Generic schema untuk respons sukses. `T` diisi dengan tipe data spesifik tiap mo
   ],
   "meta": {
     "api": { "version": "1.0.0" },
-    "generated_at": "2026-05-24T02:00:00Z"
+    "generated_at": "2026-05-24T02:00:00Z",
+    "model": null
   }
-}
-```
-
-#### `UnauthorizedResponse` — HTTP 401
-
-```json
-{
-  "detail": "Akses Ditolak: API Key tidak valid atau tidak ditemukan"
 }
 ```
 
@@ -147,18 +128,18 @@ Generic schema untuk respons sukses. `T` diisi dengan tipe data spesifik tiap mo
 ## Cara Pakai di Modul Baru
 
 ```python
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from model.utils import verify_api_key, get_now
 from model.schemas import SuccessResponse, ErrorResponseWrapper, MetaInfo
 
 router = APIRouter(dependencies=[Depends(verify_api_key)])
 
 @router.post("/predict/contoh", response_model=SuccessResponse[dict])
-async def contoh_endpoint(response: Response):
+async def contoh_endpoint():
     return SuccessResponse(
         message="Berhasil",
         data={"hasil": "..."},
-        meta=MetaInfo(generated_at=get_now(), model={"name": "MyModel", "version": "1.0.0"})
+        meta=MetaInfo(generated_at=get_now())
     )
 ```
 
