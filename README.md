@@ -24,7 +24,7 @@ Membaca dan memvalidasi environment variable dari file `.env` menggunakan `pydan
 | Variabel | Keterangan |
 |---|---|
 | `GEMINI_API_KEY` | API Key untuk Google Gemini (dipakai modul GenAI) |
-| `VISION_API_KEY` | API Key untuk proteksi endpoint |
+| `WASTEFY_API_KEY` | API Key untuk proteksi endpoint |
 
 ### Penggunaan
 
@@ -38,7 +38,7 @@ api_key = settings.GEMINI_API_KEY
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-VISION_API_KEY=your_secret_api_key_here
+WASTEFY_API_KEY=your_secret_api_key_here
 ```
 
 ---
