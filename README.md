@@ -1,10 +1,10 @@
-# 🥦 Vision Model — Klasifikasi Kondisi Fisik Sayur & Buah
+# Vision Model (Klasifikasi Kondisi Fisik Sayur & Buah)
 
 Modul FastAPI untuk mengklasifikasikan kondisi fisik sayur dan buah menggunakan model **MobileNetV2** yang dilatih dengan Transfer Learning (Feature Extraction).
 
 ---
 
-## 📁 Struktur Folder
+## Struktur Folder
 
 ```
 model/vision/
@@ -20,7 +20,7 @@ model/vision/
 
 ---
 
-## 🧠 Spesifikasi Model
+## Spesifikasi Model
 
 | Properti | Detail |
 |---|---|
@@ -43,7 +43,7 @@ Format internal label dari model: `nama_item||jenis_item||kondisi_fisik`
 
 ---
 
-## 🚀 Spesifikasi Endpoint
+## Spesifikasi Endpoint
 
 ### `POST /predict/vision`
 
@@ -69,7 +69,7 @@ Content-Type: multipart/form-data
 
 ---
 
-## 📥 Contoh Respons API
+## Contoh Respons API
 
 ### ✅ 200 OK, Gambar Dikenali
 
@@ -207,23 +207,16 @@ VISION_API_KEY=kunci_rahasia_123
 ### 3. Daftarkan Router ke `main.py`
 
 ```python
-from model.vision.api_vision import router as api_vision
+from model.vision.api_vision import router as vision_router
 
-app.include_router(api_vision)
+app.include_router(vision_router)
 ```
 
 ### 4. Jalankan Server
 
-**Untuk Pengujian Lokal (Development):**  
 Gunakan opsi `--reload` agar server otomatis menyala ulang saat ada perubahan kode.
 ```bash
 uvicorn main:app --reload
-```
-
-**Untuk Production (Hugging Face Spaces / Cloud):**  
-Wajib mendefinisikan host dan port secara eksplisit tanpa fitur reload agar performa server tetap stabil.
-```bash
-uvicorn main:app --host 0.0.0.0 --port 7860
 ```
 
 ### 5. Uji Endpoint via cURL
