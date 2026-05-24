@@ -1,13 +1,13 @@
-# GENAI (Panduan Penyimpanan Bahan Baku via Gemini AI)
+# GenAI (Panduan Penyimpanan Bahan Baku via Gemini AI)
 
-Modul FastAPI untuk menghasilkan panduan penyimpanan bahan baku dapur katering secara otomatis menggunakan Google Gemini AI.
+Modul FastAPI untuk menghasilkan panduan penyimpanan sayur dan buah secara otomatis menggunakan Google Gemini AI.
 
 ---
 
 ## Struktur Folder
 
 ```
-feat/genai/
+model/genai/
 ├── .env.example
 ├── .gitignore
 ├── api_genai.py
@@ -39,8 +39,9 @@ feat/genai/
    cp .env.example .env
    ```
    Kemudian edit `.env`:
-   ```
+   ```env
    GEMINI_API_KEY=your_api_key_here
+   VISION_API_KEY=your_secret_api_key_here
    ```
 
 ---
@@ -59,47 +60,63 @@ uvicorn main:app --reload
 
 Menghasilkan panduan penyimpanan untuk satu bahan baku.
 
-**Request Body:**
+#### Request Headers
+
+```http
+X-API-Key: <kunci_rahasia_api_anda>
+Content-Type: application/json
+```
+
+#### Request Body
 
 ```json
 {
-  "nama_item": "Ayam Fillet",
-  "jenis_item": "Protein Hewani",
-  "kondisi_fisik": "Segar",
-  "lokasi_penyimpanan": "Chiller",
-  "sisa_hari": 2
+  "nama_item": "Apel",
+  "jenis_item": "Buah",
+  "kondisi_fisik": "Matang",
+  "lokasi_penyimpanan": "Pendingin",
+  "sisa_hari": 5
 }
 ```
 
-| Field | Tipe | Keterangan |
+| Field | Tipe | Nilai Valid |
 |---|---|---|
-| `nama_item` | string | Nama bahan baku |
-| `jenis_item` | string | Kategori bahan (Sayur, Buah) |
-| `kondisi_fisik` | string | Kondisi fisik saat ini (Mentah, Matang, Terlalu Matang, Segar, Busuk) |
-| `lokasi_penyimpanan` | string | Lokasi simpan saat ini (misal: Suhu Ruang, Pendingin, Pembeku) |
-| `sisa_hari` | integer | Perkiraan sisa umur simpan dalam hari |
+| `nama_item` | string | Anggur, Apel, Cabai, Jeruk, Kentang, Mangga, Mentimun, Pisang, Tomat, Wortel |
+| `jenis_item` | string | Buah, Sayur |
+| `kondisi_fisik` | string | Busuk, Matang, Mentah, Terlalu Matang, Segar |
+| `lokasi_penyimpanan` | string | Suhu Ruang, Pendingin, Pembeku |
+| `sisa_hari` | integer | 0–40 hari |
 
-**Response Sukses (`200 OK`):**
-
-```json
-{
-  "status": "success",
-  "teks_panduan": "- Tindakan Prioritas: Gunakan hari ini sebelum kualitas menurun\n- Cara Simpan: Simpan di chiller suhu 0–4°C dalam wadah tertutup\n- Tips Katering: Pisahkan dari bahan matang untuk cegah kontaminasi"
-}
-```
-
-**Response Error:**
+#### Respons Sukses (`200 OK`)
 
 ```json
 {
-  "error": "pesan error"
+  "code": 200,
+  "data": {
+    "cara_simpan": "- Tindakan Prioritas: Segera pindah ke tempat sejuk...\n- Cara Simpan: Simpan dalam wadah tertutup rapat...\n- Tips Tambahan: Pisahkan dari bahan berbau kuat..."
+  },
+  "message": "Panduan berhasil dibuat",
+  "meta": {
+    "api": { "version": "1.0.0" },
+    "generated_at": "2026-05-24T02:00:00Z",
+    "model": null
+  },
+  "status": "success"
 }
 ```
+
+#### Respons Error
+
+| Kode | Keterangan |
+|---|---|
+| `401` | API Key tidak valid atau tidak ada |
+| `422` | Input tidak sesuai nilai valid |
+| `500` | Gagal terhubung ke Gemini API |
 
 ---
 
 ## Catatan
 
 - File `.env` **tidak boleh** di-commit ke repository. Pastikan `.gitignore` sudah mencantumkan `.env`.
-- Model yang digunakan: `gemini-3.5-flash` (dapat diubah di `api_genai.py`).
-- Output AI dibatasi dengan temperature 0.2 untuk hasil yang konsisten.
+- Output AI dibatasi dengan `temperature=0.2` untuk hasil yang konsisten.
+- Jika `sisa_hari` bernilai `0`, kondisi otomatis dikirim sebagai `Kedaluwarsa/Perlu Segera Diolah` ke prompt.
