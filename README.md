@@ -201,7 +201,7 @@ copy .env.example .env
 
 Pastikan isi file `.env` terlihat seperti ini:
 ```env 
-VISION_API_KEY=kunci_rahasia_123
+WASTEFY_API_KEY=kunci_rahasia_123
 ```
 
 ### 3. Daftarkan Router ke `main.py`
