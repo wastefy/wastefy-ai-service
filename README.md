@@ -75,6 +75,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
+  "status": "success",
   "code": 200,
   "data": {
     "out_of_scope": false,
@@ -88,8 +89,7 @@ Content-Type: multipart/form-data
     "api": { "version": "1.0.0" },
     "generated_at": "2026-05-24T02:00:00Z",
     "model": { "name": "Vision MobileNetV2", "version": "1.0.0" }
-  },
-  "status": "success"
+  }
 }
 ```
 
@@ -97,6 +97,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
+  "status": "success",
   "code": 200,
   "data": {
     "out_of_scope": true,
@@ -110,8 +111,7 @@ Content-Type: multipart/form-data
     "api": { "version": "1.0.0" },
     "generated_at": "2026-05-24T02:00:00Z",
     "model": { "name": "Vision MobileNetV2", "version": "1.0.0" }
-  },
-  "status": "success"
+  }
 }
 ```
 
@@ -119,6 +119,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
+  "status": "error",
   "code": 401,
   "errors": [
     {
@@ -131,8 +132,7 @@ Content-Type: multipart/form-data
     "api": { "version": "1.0.0" },
     "generated_at": "2026-05-24T02:00:00Z",
     "model": null
-  },
-  "status": "error"
+  }
 }
 ```
 
@@ -140,6 +140,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
+  "status": "error",
   "code": 422,
   "errors": [
     {
@@ -151,8 +152,7 @@ Content-Type: multipart/form-data
   "meta": {
     "api": { "version": "1.0.0" },
     "generated_at": "2026-05-24T02:00:00Z"
-  },
-  "status": "error"
+  }
 }
 ```
 
@@ -160,6 +160,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
+  "status": "error",
   "code": 500,
   "errors": [
     {
@@ -171,8 +172,7 @@ Content-Type: multipart/form-data
   "meta": {
     "api": { "version": "1.0.0" },
     "generated_at": "2026-05-24T02:00:00Z"
-  },
-  "status": "error"
+  }
 }
 ```
 

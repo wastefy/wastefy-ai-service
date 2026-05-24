@@ -71,6 +71,7 @@ VISION_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "success",
                     "code": 200,
                     "data": {
                         "out_of_scope": False,
@@ -84,8 +85,7 @@ VISION_RESPONSES = {
                         "api": {"version": "1.0.0"},
                         "generated_at": "2026-05-24T02:00:00Z",
                         "model": {"name": "Vision MobileNetV2", "version": "1.0.0"}
-                    },
-                    "status": "success"
+                    }
                 }
             }
         }
@@ -96,11 +96,11 @@ VISION_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "error",
                     "code": 401,
                     "errors": [{"error_code": "unauthorized", "message": "API Key tidak valid"}],
                     "message": "Akses ditolak",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "error"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}
                 }
             }
         }
@@ -111,11 +111,11 @@ VISION_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "error",
                     "code": 422,
                     "errors": [{"error_code": "file_too_large", "message": "Ukuran gambar melebihi batas 5MB."}],
                     "message": "Data tidak dapat diproses",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "error"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}
                 }
             }
         }
@@ -126,11 +126,11 @@ VISION_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "error",
                     "code": 500,
                     "errors": [{"error_code": "internal_server_error", "message": "Terjadi kesalahan saat memproses gambar..."}],
                     "message": "Terjadi kegagalan sistem",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "error"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}
                 }
             }
         }
