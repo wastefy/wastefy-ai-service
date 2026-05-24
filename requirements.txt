@@ -1,2 +1,9 @@
 fastapi
 uvicorn[standard]
+pydantic-settings
+python-dotenv
+tensorflow
+pillow
+numpy
+python-multipart
+google-genai
