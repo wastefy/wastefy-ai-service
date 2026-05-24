@@ -25,16 +25,14 @@ model/genai/
 
 ---
 
-## Instalasi
+## Cara Pakai
 
-1. Clone repository dan masuk ke direktori project.
-
-2. Install dependensi:
+1. Install dependensi:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Salin file environment dan isi API key:
+2. Salin file environment dan isi API key:
    ```bash
    cp .env.example .env
    ```
@@ -44,14 +42,33 @@ model/genai/
    VISION_API_KEY=your_secret_api_key_here
    ```
 
----
+3. Daftarkan router ke `main.py`:
+    ```python
+    from model.genai.api_genai import router as genai_router
 
-## Menjalankan Server
+    app.include_router(genai_router)
+    ```
 
-```bash
-uvicorn main:app --reload
-```
+4. Jalankan Server
 
+    ```bash
+    uvicorn main:app --reload
+    ```
+
+5. Uji Endpoint via cURL
+
+    ```bash
+    curl -X POST "http://localhost:8000/predict/genai" \
+        -H "X-API-Key: kunci_rahasia_123" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "nama_item": "Apel",
+          "jenis_item": "Buah",
+          "kondisi_fisik": "Matang",
+          "lokasi_penyimpanan": "Pendingin",
+          "sisa_hari": 5
+        }'
+    ```
 ---
 
 ## Endpoint
