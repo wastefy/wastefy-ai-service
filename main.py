@@ -23,19 +23,19 @@ app = FastAPI(
 
         **Format Response Standar:**
         ```json
-                {
-                    "code": 200,
-                    "data": { ... },
-                    "message": "Deskripsi dalam Bahasa Indonesia",
-                    "meta": {
-                        "api": {"version": "1.0.0"},
-                        "generated_at": "ISO 8601",
-                        "model": {"name": "...", "version": "1.0.0"} | null
-                    },
-                    "status": "success | error"
-                }
-                ```
-        """)
+        {
+            "code": 200,
+            "data": { ... },
+            "message": "Deskripsi dalam Bahasa Indonesia",
+            "meta": {
+                "api": {"version": "1.0.0"},
+                "generated_at": "ISO 8601",
+                "model": {"name": "...", "version": "1.0.0"} | null
+            },
+            "status": "success | error"
+        }
+        ```
+    """)
 )
 
 # CORS
