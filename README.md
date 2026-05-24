@@ -119,7 +119,20 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "detail": "Akses Ditolak: API Key tidak valid atau tidak ditemukan"
+  "code": 401,
+  "errors": [
+    {
+      "error_code": "unauthorized",
+      "message": "API Key tidak valid"
+    }
+  ],
+  "message": "Akses ditolak",
+  "meta": {
+    "api": { "version": "1.0.0" },
+    "generated_at": "2026-05-24T02:00:00Z",
+    "model": null
+  },
+  "status": "error"
 }
 ```
 
