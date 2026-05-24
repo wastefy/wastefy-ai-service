@@ -59,6 +59,11 @@ async def root():
         "status": "aktif"
     }
 
+# Health
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 # Handler 401
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
