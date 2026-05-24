@@ -11,19 +11,19 @@ class MetaInfo(BaseModel):
     model: Optional[dict] = None
 
 class SuccessResponse(BaseModel, Generic[T]):
+    status: str = "success"
     code: int = 200
     data: T
     message: str
     meta: MetaInfo
-    status: str = "success"
 
 class ErrorDetail(BaseModel):
     error_code: str
     message: str
 
 class ErrorResponseWrapper(BaseModel):
+    status: str = "error"
     code: int
     errors: List[ErrorDetail]
     message: str
     meta: MetaInfo
-    status: str = "error"
