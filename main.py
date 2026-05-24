@@ -3,6 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
+import textwrap
 
 from model.utils import get_now
 from model.schemas import ErrorResponseWrapper, ErrorDetail, MetaInfo
@@ -12,29 +13,29 @@ from model.genai.api_genai import router as genai_router
 load_dotenv()
 app = FastAPI(
     title="Wastefy AI Services",
-    description=
-    """Layanan AI untuk klasifikasi kondisi fisik sayur & buah dan panduan penyimpanannya.
+    version="1.0.0",
+    description=textwrap.dedent("""\
+        Layanan AI untuk klasifikasi kondisi fisik sayur & buah dan panduan penyimpanannya.
 
-    **Modul tersedia:**
-    - `POST /predict/vision` — Klasifikasi kondisi fisik sayur & buah
-    - `POST /predict/genai` — Panduan penyimpanan via Gemini AI
+        **Modul tersedia:**
+        - **POST** `/predict/vision` — Klasifikasi kondisi fisik sayur & buah
+        - **POST** `/predict/genai` — Panduan penyimpanan via Gemini AI
 
-    **Format Response Standar:**
-    ```json
-    {
-        "code": 200,
-        "data": { ... },
-        "message": "Deskripsi dalam Bahasa Indonesia",
-        "meta": {
-            "api": {"version": "1.0.0"},
-            "generated_at": "ISO 8601",
-            "model": {"name": "...", "version": "1.0.0"} | null
-        },
-        "status": "success | error"
-    }
-    ```
-    """,
-    version="1.0.0"
+        **Format Response Standar:**
+        ```json
+                {
+                    "code": 200,
+                    "data": { ... },
+                    "message": "Deskripsi dalam Bahasa Indonesia",
+                    "meta": {
+                        "api": {"version": "1.0.0"},
+                        "generated_at": "ISO 8601",
+                        "model": {"name": "...", "version": "1.0.0"} | null
+                    },
+                    "status": "success | error"
+                }
+                ```
+        """)
 )
 
 # CORS
