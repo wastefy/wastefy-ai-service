@@ -73,11 +73,11 @@ GENAI_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "success",
                     "code": 200,
                     "data": {"cara_simpan": "- Tindakan Prioritas: Segera pindah ke tempat sejuk...\n- Cara Simpan: Simpan dalam wadah tertutup rapat...\n- Tips Tambahan: Pisahkan dari bahan berbau kuat..."},
                     "message": "Panduan berhasil dibuat",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "success"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}
                 }
             }
         }
@@ -88,11 +88,11 @@ GENAI_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "error",
                     "code": 401,
                     "errors": [{"error_code": "unauthorized", "message": "API Key tidak valid"}],
                     "message": "Akses ditolak",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "error"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}                    
                 }
             }
         }
@@ -103,11 +103,11 @@ GENAI_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "error",
                     "code": 422,
                     "errors": [{"error_code": "validation_error", "message": "Value error, Jenis harus: Buah, Sayur"}],
                     "message": "Data tidak dapat diproses",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "error"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}                   
                 }
             }
         }
@@ -118,11 +118,11 @@ GENAI_RESPONSES = {
         "content": {
             "application/json": {
                 "example": {
+                    "status": "error",
                     "code": 500,
                     "errors": [{"error_code": "internal_server_error", "message": "Gagal terhubung ke Gemini API"}],
                     "message": "Terjadi kegagalan sistem",
-                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"},
-                    "status": "error"
+                    "meta": {"api": {"version": "1.0.0"}, "generated_at": "2026-05-24T02:00:00Z"}
                 }
             }
         }

@@ -108,6 +108,7 @@ Content-Type: application/json
 
 ```json
 {
+  "status": "success"
   "code": 200,
   "data": {
     "cara_simpan": "- Tindakan Prioritas: Segera pindah ke tempat sejuk...\n- Cara Simpan: Simpan dalam wadah tertutup rapat...\n- Tips Tambahan: Pisahkan dari bahan berbau kuat..."
@@ -118,7 +119,6 @@ Content-Type: application/json
     "generated_at": "2026-05-24T02:00:00Z",
     "model": null
   },
-  "status": "success"
 }
 ```
 
