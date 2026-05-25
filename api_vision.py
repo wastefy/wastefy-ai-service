@@ -1,10 +1,7 @@
 import io
-import json
-import os
 from typing import Optional
 
 import numpy as np
-import tensorflow as tf
 from PIL import Image
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -15,7 +12,7 @@ from model.schemas import (
     ErrorDetail, ErrorResponseWrapper,
     MetaInfo, SuccessResponse
 )
-from model.utils import get_now, verify_api_key
+from model.utils import get_now, load_model, verify_api_key
 
 router = APIRouter(prefix="/predict", tags=["Vision Model"])
 
@@ -32,19 +29,16 @@ class VisionData(BaseModel):
     confidence: float
 
 # 2. LOAD MODEL & METADATA
-BASE_DIR = os.path.dirname(__file__)
-MODEL_PATH = os.path.join(BASE_DIR, "model.keras")
-METADATA_PATH = os.path.join(BASE_DIR, "model_metadata.json")
-
-if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError(f"File model tidak ditemukan: {MODEL_PATH}")
-if not os.path.exists(METADATA_PATH):
-    raise FileNotFoundError(f"File metadata tidak ditemukan: {METADATA_PATH}")
-
-model = tf.keras.models.load_model(MODEL_PATH)
-
-with open(METADATA_PATH, encoding="utf-8") as f:
-    metadata = json.load(f)
+try:
+    model, metadata = load_model("vision")
+    
+    CLASS_NAMES = metadata["class_names"]
+    CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.6)
+    ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 1.134)
+except Exception as e:
+    model = None
+    metadata = None
+    print(f"[WARNING] Gagal memuat Vision Model: {e}")
 
 CLASS_NAMES = metadata["class_names"]
 CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.6)
@@ -196,6 +190,6 @@ async def prediksi_gambar(file_foto: UploadFile = File(..., description="File ga
         return JSONResponse(status_code=500, content=ErrorResponseWrapper(
             code=500,
             errors=[ErrorDetail(error_code="internal_server_error", message=str(e))],
-            message="Terjadi kegagalan sistem saat memproses gambar",
+            message="Terjadi kegagalan sistem",
             meta=MetaInfo(generated_at=get_now()),
         ).model_dump())
