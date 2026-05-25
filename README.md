@@ -154,9 +154,9 @@ curl -X POST "http://localhost:8000/predict/regression" \
      -d '{
        "nama_item": "Tomat",
        "jenis_item": "Sayur",
+       "kondisi_fisik": "Segar"
        "lokasi_penyimpanan": "Pendingin",
        "tanggal_beli": "2026-05-10",
-       "kondisi_fisik": "Segar"
      }'
 ```
 
@@ -177,17 +177,17 @@ POST /predict/regression
 | -------------------- | -------- | ----------------------------------------------------------- |
 | `nama_item`          | `string` | Nama item (hanya yang didukung, misal: Anggur, Apel, dll)   |
 | `jenis_item`         | `string` | `Buah` atau `Sayur`                                         |
+| `kondisi_fisik`      | `string` | `Segar`, `Matang`, `Mentah`, `Terlalu Matang`, atau `Busuk` |
 | `lokasi_penyimpanan` | `string` | `Suhu Ruang`, `Pendingin`, atau `Pembeku`                   |
 | `tanggal_beli`       | `string` | Format `YYYY-MM-DD`, tidak boleh di masa depan              |
-| `kondisi_fisik`      | `string` | `Segar`, `Matang`, `Mentah`, `Terlalu Matang`, atau `Busuk` |
 
 ```json
 {
   "nama_item": "Tomat",
   "jenis_item": "Sayur",
+  "kondisi_fisik": "Segar"
   "lokasi_penyimpanan": "Pendingin",
   "tanggal_beli": "2026-05-10",
-  "kondisi_fisik": "Segar"
 }
 
 ## Contoh Response API
@@ -289,7 +289,7 @@ Dikembalikan jika model tidak ditemukan (gagal dimuat) atau terjadi crash saat i
 
 ---
 
-## 📊 Performa Model
+## Performa Model
 
 | Metrik                | Nilai      |
 | --------------------- | ---------- |
