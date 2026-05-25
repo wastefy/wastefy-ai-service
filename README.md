@@ -1,10 +1,10 @@
-# 🥦 Fresh Predictor — Estimasi Sisa Hari Sayuran & Buah
+# Regression (Estimasi Sisa Hari Sayuran & Buah)
 
 Model deep learning untuk memprediksi **sisa hari ketahanan** sayuran dan buah-buahan berdasarkan jenis item, kondisi fisik, dan lokasi penyimpanan. Dibangun sebagai bagian dari sistem rekomendasi kesegaran bahan makanan.
 
 ---
 
-## 📋 Deskripsi Proyek
+## Deskripsi Proyek
 
 Proyek ini merupakan komponen **AI/ML** dari tim yang terdiri dari:
 
@@ -16,21 +16,19 @@ Model menerima input berupa nama item, jenis, lokasi penyimpanan, tanggal beli, 
 
 ---
 
-## 📁 Struktur File
+## Struktur File
 
 ```
-├── freshness_predictor.ipynb   # Notebook training lengkap (11 cell)
+├── regression_model.ipynb      # Notebook training lengkap (11 cell)
 ├── api_regression.py           # FastAPI router endpoint prediksi
 ├── model.keras                 # Model terlatih (dihasilkan setelah run notebook)
 ├── model_metadata.json         # Encoder, scaler, upper-bound lookup (dihasilkan setelah run notebook)
 └── README.md
 ```
 
-> `model.keras` dan `model_metadata.json` tidak disertakan di repository. Jalankan notebook untuk menghasilkannya.
-
 ---
 
-## 🧠 Arsitektur Model
+## Arsitektur Model
 
 Model menggunakan **Feedforward Deep Neural Network** dengan arsitektur:
 
@@ -53,7 +51,7 @@ Dense(1)   → Output (sisa hari)
 
 ---
 
-## 🔧 Fitur Input
+## Input
 
 Model dilatih dengan **9 fitur** hasil feature engineering:
 
@@ -73,7 +71,7 @@ Model dilatih dengan **9 fitur** hasil feature engineering:
 
 ---
 
-## 🛡️ Mekanisme Safe Prediction
+## Mekanisme Safe Prediction
 
 Untuk mencegah overprediksi berbahaya (model memprediksi item masih segar padahal sudah mendekati busuk), setiap prediksi melewati tiga lapisan pengamanan:
 
@@ -91,7 +89,7 @@ Contoh:
 
 ---
 
-## 📓 Struktur Notebook
+## Struktur Notebook
 
 | Cell | Isi                                                         |
 | ---- | ----------------------------------------------------------- |
@@ -115,7 +113,7 @@ Contoh:
 
 ---
 
-## ⚙️ Cara Pakai
+## Cara Pakai
 
 ### 1. Install Dependensi
 
@@ -132,17 +130,7 @@ pandas >= 1.5
 numpy >= 1.23
 ```
 
-### 2. Jalankan Training & Hasilkan Model
-
-1. Pastikan dataset tersedia di path yang sesuai (ubah `DATA_PATH` di Cell 1 jika perlu)
-2. Buka notebook:
-   ```bash
-   jupyter notebook freshness_predictor.ipynb
-   ```
-3. Jalankan semua cell secara berurutan (**Run All**)
-4. Setelah selesai, `model.keras` dan `model_metadata.json` akan tersimpan di direktori yang sama
-
-### 3. Daftarkan Router ke `main.py`
+### 2. Daftarkan Router ke `main.py`
 
 ```python
 from fastapi import FastAPI
@@ -152,16 +140,13 @@ app = FastAPI()
 app.include_router(regression_router)
 ```
 
-### 4. Jalankan Server
+### 3. Jalankan Server
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Server berjalan di `http://localhost:8000`.  
-Dokumentasi interaktif tersedia di `http://localhost:8000/docs`.
-
-### 5. Uji Endpoint via cURL
+### 4. Uji Endpoint via cURL
 
 ```bash
 curl -X POST "http://localhost:8000/predict/regression" \
@@ -177,7 +162,7 @@ curl -X POST "http://localhost:8000/predict/regression" \
 
 ---
 
-## 🚀 Spesifikasi Endpoint
+## Spesifikasi Endpoint
 
 ```
 POST /predict/regression
@@ -185,9 +170,12 @@ POST /predict/regression
 
 ### Request Body
 
+**Headers:**
+- `X-API-Key`: (Wajib) API Key untuk autentikasi.
+
 | Field                | Tipe     | Keterangan                                                  |
 | -------------------- | -------- | ----------------------------------------------------------- |
-| `nama_item`          | `string` | Nama item (harus sesuai data training)                      |
+| `nama_item`          | `string` | Nama item (hanya yang didukung, misal: Anggur, Apel, dll)   |
 | `jenis_item`         | `string` | `Buah` atau `Sayur`                                         |
 | `lokasi_penyimpanan` | `string` | `Suhu Ruang`, `Pendingin`, atau `Pembeku`                   |
 | `tanggal_beli`       | `string` | Format `YYYY-MM-DD`, tidak boleh di masa depan              |
@@ -201,55 +189,101 @@ POST /predict/regression
   "tanggal_beli": "2026-05-10",
   "kondisi_fisik": "Segar"
 }
-```
+
+## Contoh Response API
 
 ### ✅ 200 OK — Prediksi Berhasil
 
 ```json
 {
-  "estimasi_sisa_hari": 7
-}
-```
-
-### ❌ 200 OK — Input Tidak Dikenal
-
-Dikembalikan dengan status 200 namun berisi pesan error jika nilai input tidak ada di data training:
-
-```json
-{
-  "error": "Nilai 'Bayam' tidak dikenal untuk fitur 'nama_item'. Nilai valid: ['Anggur', 'Apel', 'Cabe', 'Jeruk', 'Kentang', 'Mangga', 'Pisang', 'Timun', 'Tomat', 'Wortel']"
-}
-```
-
-### ❌ 200 OK — Tanggal Beli di Masa Depan
-
-```json
-{
-  "error": "Tanggal beli tidak boleh di masa depan."
-}
-```
-
-### ❌ 200 OK — Model Tidak Ditemukan
-
-```json
-{
-  "error": "Model atau metadata tidak ditemukan."
-}
-```
-
-### ❌ 422 Unprocessable Entity — Format Request Salah
-
-Dikembalikan otomatis oleh FastAPI jika field wajib tidak ada atau tipe data salah:
-
-```json
-{
-  "detail": [
-    {
-      "loc": ["body", "tanggal_beli"],
-      "msg": "field required",
-      "type": "value_error.missing"
+  "status": "success",
+  "code": 200,
+  "data": {
+    "estimasi_sisa_hari": 7
+  },
+  "message": "Estimasi sisa hari berhasil dihitung",
+  "meta": {
+    "api": {
+      "version": "1.0.0"
+    },
+    "generated_at": "2026-05-24T02:00:00Z",
+    "model": {
+      "name": "Regression Model",
+      "version": "1.0.0"
     }
-  ]
+  }
+}
+```
+
+### ❌ 401 Unauthorized — API Key Tidak Valid
+
+Dikembalikan jika header X-API-Key salah atau tidak disertakan.
+
+```json
+{
+  "status": "error",
+  "code": 401,
+  "errors": [
+    {
+      "error_code": "unauthorized",
+      "message": "API Key tidak valid"
+    }
+  ],
+  "message": "Akses ditolak",
+  "meta": {
+    "api": {
+      "version": "1.0.0"
+    },
+    "generated_at": "2026-05-24T02:00:00Z"
+  }
+}
+```
+
+### ❌ 422 Unprocessable Entity — Validasi Input Gagal
+
+Dikembalikan otomatis jika format salah, item tidak terdaftar (Pydantic validation), atau tanggal di masa depan.
+
+```json
+{
+  "status": "error",
+  "code": 422,
+  "errors": [
+    {
+      "error_code": "invalid_input",
+      "message": "Item harus salah satu dari: Anggur, Apel, Cabai..." 
+    }
+  ],
+  "message": "Data tidak dapat diproses",
+  "meta": {
+    "api": {
+      "version": "1.0.0"
+    },
+    "generated_at": "2026-05-24T02:00:00Z"
+  }
+}
+```
+
+### ❌ 500 Internal Server Error — Kesalahan Sistem
+
+Dikembalikan jika model tidak ditemukan (gagal dimuat) atau terjadi crash saat inferensi.
+
+```json
+{
+  "status": "error",
+  "code": 500,
+  "errors": [
+    {
+      "error_code": "internal_server_error",
+      "message": "Model atau metadata tidak ditemukan."
+    }
+  ],
+  "message": "Terjadi kegagalan sistem",
+  "meta": {
+    "api": {
+      "version": "1.0.0"
+    },
+    "generated_at": "2026-05-24T02:00:00Z"
+  }
 }
 ```
 
