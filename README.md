@@ -38,7 +38,9 @@ api_key = settings.GEMINI_API_KEY
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-WASTEFY_API_KEY=your_secret_api_key_here
+WASTEFY_API_KEY=your_wastefy_api_key_here
+HF_TOKEN_RIIMARU=your_hf_token_riimaru_here
+HF_TOKEN_ARCIII=your_hf_token_arciii_here
 ```
 
 ---
