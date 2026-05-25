@@ -7,11 +7,11 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
-from schemas import (
+from model.schemas import (
     ErrorDetail, ErrorResponseWrapper,
     MetaInfo, SuccessResponse
 )
-from utils import get_now, load_model, verify_api_key
+from model.utils import get_now, load_model, verify_api_key
 
 router = APIRouter(prefix="/predict", tags=["Regression Model"])
 
@@ -30,9 +30,9 @@ class ModelInfo(BaseModel):
 class InputRegresi(BaseModel):
     nama_item: str = Field(..., description="Nama item: Anggur, Apel, Cabai, Jeruk, Kentang, Mangga, Mentimun, Pisang, Tomat, Wortel")
     jenis_item: str = Field(..., description="Jenis item: Buah, Sayur")
+    kondisi_fisik: str = Field(..., description="Kondisi fisik: Segar, Matang, Mentah, Terlalu Matang, Busuk")
     lokasi_penyimpanan: str = Field(..., description="Lokasi penyimpanan: Suhu Ruang, Pendingin, Pembeku")
     tanggal_beli: str = Field(..., description="Format tanggal pembelian: YYYY-MM-DD")
-    kondisi_fisik: str = Field(..., description="Kondisi fisik: Segar, Matang, Mentah, Terlalu Matang, Busuk")
 
     @field_validator('nama_item')
     @classmethod
@@ -48,18 +48,18 @@ class InputRegresi(BaseModel):
             raise ValueError(f'Jenis harus: {", ".join(VALID_JENIS)}')
         return v
 
-    @field_validator('lokasi_penyimpanan')
-    @classmethod
-    def validasi_lokasi(cls, v):
-        if v not in VALID_LOKASI:
-            raise ValueError(f'Lokasi harus: {", ".join(VALID_LOKASI)}')
-        return v
-
     @field_validator('kondisi_fisik')
     @classmethod
     def validasi_kondisi(cls, v):
         if v not in VALID_KONDISI:
             raise ValueError(f'Kondisi harus: {", ".join(VALID_KONDISI)}')
+        return v
+    
+    @field_validator('lokasi_penyimpanan')
+    @classmethod
+    def validasi_lokasi(cls, v):
+        if v not in VALID_LOKASI:
+            raise ValueError(f'Lokasi harus: {", ".join(VALID_LOKASI)}')
         return v
 
     @field_validator('tanggal_beli')
@@ -110,8 +110,8 @@ def build_feature_vector(
 ) -> np.ndarray:
     enc_item   = encode_categorical(nama_item,          "nama_item")
     enc_jenis  = encode_categorical(jenis_item,         "jenis_item")
-    enc_lokasi = encode_categorical(lokasi_penyimpanan, "lokasi_penyimpanan")
     enc_label  = encode_categorical(label,              "label")
+    enc_lokasi = encode_categorical(lokasi_penyimpanan, "lokasi_penyimpanan")
 
     label_score    = LABEL_ORDER.get(label, 2)
     lokasi_mult    = LOKASI_MULT.get(lokasi_penyimpanan, 1.0)
@@ -239,8 +239,8 @@ async def prediksi_sisa_hari(data: InputRegresi):
         X = build_feature_vector(
             nama_item            = data.nama_item,
             jenis_item           = data.jenis_item,
-            lokasi_penyimpanan   = data.lokasi_penyimpanan,
             label                = data.kondisi_fisik,
+            lokasi_penyimpanan   = data.lokasi_penyimpanan,
             hari_sejak_pembelian = hari_sejak
         )
 
