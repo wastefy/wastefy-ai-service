@@ -108,7 +108,7 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "success"
+  "status": "success",
   "code": 200,
   "data": {
     "cara_simpan": "- Tindakan Prioritas: Segera pindah ke tempat sejuk...\n- Cara Simpan: Simpan dalam wadah tertutup rapat...\n- Tips Tambahan: Pisahkan dari bahan berbau kuat..."
@@ -134,6 +134,7 @@ Content-Type: application/json
 
 ## Catatan
 
+- Model yang digunakan: `gemini-3.5-flash`
 - File `.env` **tidak boleh** di-commit ke repository. Pastikan `.gitignore` sudah mencantumkan `.env`.
 - Output AI dibatasi dengan `temperature=0.2` untuk hasil yang konsisten.
 - Jika `sisa_hari` bernilai `0`, kondisi otomatis dikirim sebagai `Kedaluwarsa/Perlu Segera Diolah` ke prompt.
