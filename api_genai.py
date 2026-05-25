@@ -162,6 +162,6 @@ async def buat_panduan(data: DataBahanBaku):
         return JSONResponse(status_code=500, content=ErrorResponseWrapper(
             code=500,
             errors=[ErrorDetail(error_code="genai_error", message=str(e))],
-            message="Terjadi kesalahan saat memproses GenAI",
+            message="Terjadi kegagalan sistem",
             meta=MetaInfo(generated_at=waktu_sekarang)
         ).model_dump())
