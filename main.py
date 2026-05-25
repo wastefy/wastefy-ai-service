@@ -9,6 +9,7 @@ from model.utils import get_now
 from model.schemas import ErrorResponseWrapper, ErrorDetail, MetaInfo
 from model.vision.api_vision import router as vision_router
 from model.genai.api_genai import router as genai_router
+from model.regression.api_regression import router as regression_router
 
 load_dotenv()
 app = FastAPI(
@@ -50,6 +51,7 @@ app.add_middleware(
 # Router
 app.include_router(vision_router)
 app.include_router(genai_router)
+app.include_router(regression_router)
 
 # Root
 @app.get("/")

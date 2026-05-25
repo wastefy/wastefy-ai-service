@@ -9,9 +9,8 @@ Entry point utama untuk seluruh layanan AI Wastefy berbasis FastAPI.
 | Modul | Prefix | Keterangan |
 |---|---|---|
 | Vision | `/predict/vision` | Klasifikasi kondisi fisik sayur & buah |
+| Regression | `/predict/regression` | Prediksi sisa umur simpan |
 | GenAI | `/predict/genai` | Panduan penyimpanan via Gemini AI |
-
-> Modul Regression belum tersedia.
 
 ---
 
@@ -82,15 +81,11 @@ project_root/
     │
     ├── vision/             ← Klasifikasi kondisi fisik sayur & buah
     │   ├── __init__.py
-    │   ├── api_vision.py
-    │   ├── sayur_buah_classifier.keras
-    │   └── model_metadata.json
+    │   └── api_vision.py
     │
-    ├── regression/         ← Prediksi sisa umur simpan (belum tersedia)
+    ├── regression/         ← Prediksi sisa umur simpan
     │   ├── __init__.py
-    │   ├── api_regression.py
-    │   ├── prediction_model.keras
-    │   └── model_metadata.json
+    │   └── api_regression.py
     │
     └── genai/              ← Panduan penyimpanan via Gemini AI
         ├── __init__.py
