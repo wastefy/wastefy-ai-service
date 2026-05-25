@@ -21,7 +21,7 @@ VALID_JENIS = ["Buah", "Sayur"]
 VALID_KONDISI = ["Busuk", "Matang", "Mentah", "Terlalu Matang", "Segar"]
 VALID_LOKASI = ["Suhu Ruang", "Pendingin", "Pembeku"]
 
-class DataBahanBaku(BaseModel):
+class InputGenai(BaseModel):
     nama_item: str = Field(..., description="Nama item: Anggur, Apel, Cabai, Jeruk, Kentang, Mangga, Mentimun, Pisang, Tomat, Wortel")
     jenis_item: str = Field(..., description="Jenis item: Buah, Sayur")
     kondisi_fisik: str = Field(..., description="Kondisi fisik: Busuk, Matang, Mentah, Terlalu Matang, Segar")
@@ -136,7 +136,7 @@ GENAI_RESPONSES = {
     dependencies=[Depends(verify_api_key)],
     responses=GENAI_RESPONSES
 )
-async def buat_panduan(data: DataBahanBaku):
+async def buat_panduan(data: InputGenai):
     waktu_sekarang = get_now()
     try:
         status_kondisi = "Kedaluwarsa/Perlu Segera Diolah" if data.sisa_hari == 0 else data.kondisi_fisik
