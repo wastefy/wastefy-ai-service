@@ -1,100 +1,169 @@
----
-title: Wastefy AI Services
-sdk: docker
-pinned: false
----
+# Core Foundation (Shared Utilities & Schemas)
 
-# Wastefy AI Services
-
-Entry point utama untuk seluruh layanan AI Wastefy berbasis FastAPI.
+Tiga file ini adalah **fondasi bersama** yang digunakan oleh seluruh modul API (Vision, GenAI, dll.). Letakkan di `model/` sebelum mengembangkan modul apapun.
 
 ---
 
-## Modul
+## Struktur File
 
-| Modul | Prefix | Keterangan |
-|---|---|---|
-| Vision | `/predict/vision` | Klasifikasi kondisi fisik sayur & buah |
-| Regression | `/predict/regression` | Prediksi sisa umur simpan |
-| GenAI | `/predict/genai` | Panduan penyimpanan via Gemini AI |
-
----
-
-## Cara Pakai
-
-### 1. Install Dependensi
-
-```bash
-pip install -r requirements.txt
+```
+model/
+├── config.py       ← Manajemen environment variable & konfigurasi aplikasi
+├── utils.py        ← Dependency autentikasi & helper waktu
+└── schemas.py      ← Skema output Pydantic yang dipakai bersama
 ```
 
-### 2. Atur Variabel Lingkungan
+---
 
-Salin file `.env.example` dan isi dengan API key milikmu:
+## `config.py` (Konfigurasi Aplikasi)
 
-```bash
-# Linux/Mac
-cp .env.example .env
+Membaca dan memvalidasi environment variable dari file `.env` menggunakan `pydantic-settings`. Aplikasi akan **langsung crash saat startup** jika ada variabel yang tidak ditemukan — mencegah bug yang baru muncul saat runtime.
 
-# Windows
-copy .env.example .env
+### Variabel yang Diperlukan
+
+| Variabel | Keterangan |
+|---|---|
+| `GEMINI_API_KEY` | API Key untuk Google Gemini (dipakai modul GenAI) |
+| `WASTEFY_API_KEY` | API Key untuk proteksi endpoint |
+
+### Penggunaan
+
+```python
+from model.config import settings
+
+api_key = settings.GEMINI_API_KEY
 ```
 
-Isi file `.env`:
+### Contoh `.env`
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-WASTEFY_API_KEY=your_secret_api_key_here
-HF_TOKEN=your_huggingface_token_here
+WASTEFY_API_KEY=your_wastefy_api_key_here
+HF_TOKEN_RIIMARU=your_hf_token_riimaru_here
+HF_TOKEN_ARCIII=your_hf_token_arciii_here
 ```
-
-### 3. Jalankan Server
-
-**Untuk Pengujian Lokal (Development):**
-
-```bash
-uvicorn main:app --reload
-```
-
-**Untuk Production (Hugging Face Spaces / Cloud):**
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 7860
-```
-
-### 4. Akses Dokumentasi Swagger
-
-- **Lokal:** `http://localhost:8000/docs`
-- **Hugging Face:** `https://{username}-{space-name}.hf.space/docs`
 
 ---
 
-## Struktur Project
+## `utils.py` (Helper, Autentikasi, & Model Loader)
 
+Menyediakan utilitas utama yang dipakai di seluruh router API untuk menjaga kode tetap *DRY (Don't Repeat Yourself)*.
+
+### `get_now()`
+
+Mengembalikan timestamp UTC saat ini dalam format ISO 8601 untuk field `generated_at` di setiap respons.
+
+```python
+from model.utils import get_now
+
+get_now()  # → "2026-05-24T02:00:00Z"
 ```
-project_root/
-├── main.py                 ← Pusat kendali aplikasi
-├── .env.example            ← Template variabel lingkungan
-├── .gitignore
-├── README.md
-├── requirements.txt
-│
-└── model/                  ← Semua layanan AI ada di sini
-    ├── __init__.py
-    ├── config.py           ← Konfigurasi aplikasi
-    ├── utils.py            ← Autentikasi & helper
-    ├── schemas.py          ← Shared response schemas
-    │
-    ├── vision/             ← Klasifikasi kondisi fisik sayur & buah
-    │   ├── __init__.py
-    │   └── api_vision.py
-    │
-    ├── regression/         ← Prediksi sisa umur simpan
-    │   ├── __init__.py
-    │   └── api_regression.py
-    │
-    └── genai/              ← Panduan penyimpanan via Gemini AI
-        ├── __init__.py
-        ├── api_genai.py
-        └── prompt_templates.json
+
+### `verify_api_key()`
+
+FastAPI dependency untuk memvalidasi header `X-API-Key` di setiap request. Jika key tidak valid atau tidak ada, otomatis mengembalikan **401 Unauthorized**.
+
+```python
+from fastapi import APIRouter, Depends
+from model.utils import verify_api_key
+
+router = APIRouter()
+
+@router.post("/endpoint", dependencies=[Depends(verify_api_key)])
+async def my_endpoint():
+    ...
+```
+
+### `load_model(model_type: str)`
+Fungsi sentral untuk memuat model .keras dan model_metadata.json secara dinamis berdasarkan jenis model (misal: "vision" atau "regression").
+Fungsi ini dilengkapi dengan @lru_cache, memastikan model berat hanya dibaca dari storage dan dimasukkan ke RAM satu kali saja saat startup server, mencegah API melambat dan memori penuh (OOM).
+from model.utils import load_model
+
+```python
+# WAJIB dipanggil di global scope (di luar fungsi endpoint)
+try:
+    model, metadata = load_model("regression")
+except Exception as e:
+...
+```
+
+---
+
+## `schemas.py` (Skema Output Bersama)
+
+Mendefinisikan model Pydantic untuk envelope respons yang dipakai seragam di seluruh modul. Schema input yang spesifik per modul (seperti `DataBahanBaku`) didefinisikan di file API masing-masing.
+
+### Output Schemas
+
+#### `SuccessResponse[T]` — HTTP 200
+
+Generic schema untuk respons sukses. `T` diisi dengan tipe data spesifik tiap modul.
+
+```json
+{
+  "code": 200,
+  "status": "success",
+  "message": "...",
+  "data": { ... },
+  "meta": {
+    "api": { "version": "1.0.0" },
+    "generated_at": "2026-05-24T02:00:00Z",
+    "model": { "name": "...", "version": "..." }
+  }
+}
+```
+
+> Field `meta.model` hanya diisi untuk endpoint yang menggunakan model lokal (contoh: Vision, Regression). Untuk endpoint lain (seperti GenAI), nilainya null.
+
+#### `ErrorResponseWrapper` — HTTP 4xx / 5xx
+
+Dipakai untuk semua respons error termasuk 401, 422, dan 500.
+
+```json
+{
+  "code": 422,
+  "status": "error",
+  "message": "Data tidak dapat diproses",
+  "errors": [
+    {
+      "error_code": "validation_error",
+      "message": "..."
+    }
+  ],
+  "meta": {
+    "api": { "version": "1.0.0" },
+    "generated_at": "2026-05-24T02:00:00Z",
+    "model": null
+  }
+}
+```
+
+---
+
+## Cara Pakai di Modul Baru
+
+```python
+from fastapi import APIRouter, Depends
+from model.utils import verify_api_key, get_now
+from model.schemas import SuccessResponse, ErrorResponseWrapper, MetaInfo
+
+router = APIRouter(dependencies=[Depends(verify_api_key)])
+
+@router.post("/predict/contoh", response_model=SuccessResponse[dict])
+async def contoh_endpoint():
+    return SuccessResponse(
+        message="Berhasil",
+        data={"hasil": "..."},
+        meta=MetaInfo(generated_at=get_now())
+    )
+```
+
+---
+
+## Dependensi
+
+Pastikan sudah terinstall sebelum menjalankan aplikasi:
+
+```bash
+pip install -r requirements.txt
 ```
