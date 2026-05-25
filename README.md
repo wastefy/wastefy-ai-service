@@ -1,3 +1,9 @@
+---
+title: Wastefy AI Services
+sdk: docker
+pinned: false
+---
+
 # Wastefy AI Services
 
 Entry point utama untuk seluruh layanan AI Wastefy berbasis FastAPI.
