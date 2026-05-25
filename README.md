@@ -43,9 +43,9 @@ WASTEFY_API_KEY=your_secret_api_key_here
 
 ---
 
-## `utils.py` (Helper & Dependency Autentikasi)
+## `utils.py` (Helper, Autentikasi, & Model Loader)
 
-Menyediakan dua fungsi yang dipakai di seluruh router API.
+Menyediakan utilitas utama yang dipakai di seluruh router API untuk menjaga kode tetap *DRY (Don't Repeat Yourself)*.
 
 ### `get_now()`
 
@@ -70,6 +70,19 @@ router = APIRouter()
 @router.post("/endpoint", dependencies=[Depends(verify_api_key)])
 async def my_endpoint():
     ...
+```
+
+### `load_model(model_type: str)`
+Fungsi sentral untuk memuat model .keras dan model_metadata.json secara dinamis berdasarkan jenis model (misal: "vision" atau "regression").
+Fungsi ini dilengkapi dengan @lru_cache, memastikan model berat hanya dibaca dari storage dan dimasukkan ke RAM satu kali saja saat startup server, mencegah API melambat dan memori penuh (OOM).
+from model.utils import load_model
+
+```python
+# WAJIB dipanggil di global scope (di luar fungsi endpoint)
+try:
+    model, metadata = load_model("regression")
+except Exception as e:
+...
 ```
 
 ---
@@ -98,7 +111,7 @@ Generic schema untuk respons sukses. `T` diisi dengan tipe data spesifik tiap mo
 }
 ```
 
-> Field `meta.model` hanya diisi untuk endpoint yang menggunakan model lokal (contoh: Vision). Untuk endpoint lain nilainya `null`.
+> Field `meta.model` hanya diisi untuk endpoint yang menggunakan model lokal (contoh: Vision, Regression). Untuk endpoint lain (seperti GenAI), nilainya null.
 
 #### `ErrorResponseWrapper` — HTTP 4xx / 5xx
 
