@@ -11,6 +11,7 @@ tensorflow==2.21.0
 keras==3.13.2
 numpy==1.26.4
 Pillow==11.1.0
+huggingface-hub
 
 # GenAI
 google-genai==2.6.0
