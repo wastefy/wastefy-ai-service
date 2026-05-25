@@ -127,9 +127,9 @@
   "training_info": {
     "n_samples_original": 3723,
     "n_samples_augmented": 11169,
-    "test_mae_raw_int": 2.3356,
-    "test_mae_safe_int": 2.3356,
-    "best_val_mae": 2.6599,
+    "test_mae_raw_int": 2.3187,
+    "test_mae_safe_int": 2.32,
+    "best_val_mae": 2.6702,
     "noise_floor_est": 2.4875
   }
 }
