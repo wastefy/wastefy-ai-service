@@ -1,0 +1,4 @@
+.env
+__pycache__/
+*.keras
+model_metadata.json
