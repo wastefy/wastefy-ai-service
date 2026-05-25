@@ -5,13 +5,20 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import textwrap
 
+# load env 
+load_dotenv()
+
+# download model
+from scripts.download_models import download_models
+download_models()
+
+# import model
 from model.utils import get_now
 from model.schemas import ErrorResponseWrapper, ErrorDetail, MetaInfo
 from model.vision.api_vision import router as vision_router
 from model.genai.api_genai import router as genai_router
 from model.regression.api_regression import router as regression_router
 
-load_dotenv()
 app = FastAPI(
     title="Wastefy AI Services",
     version="1.0.0",

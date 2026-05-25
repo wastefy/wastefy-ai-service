@@ -40,9 +40,6 @@ except Exception as e:
     metadata = None
     print(f"[WARNING] Gagal memuat Vision Model: {e}")
 
-CLASS_NAMES = metadata["class_names"]
-CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.6)
-ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 1.134)
 IMG_SIZE = 224
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
