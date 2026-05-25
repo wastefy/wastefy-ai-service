@@ -11,7 +11,6 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from tensorflow.keras.preprocessing.image import img_to_array
 
-from model.config import settings
 from model.schemas import (
     ErrorDetail, ErrorResponseWrapper,
     MetaInfo, SuccessResponse
