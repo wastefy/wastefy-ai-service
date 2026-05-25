@@ -1,93 +1,135 @@
 {
-  "model_info": {
-    "name": "Sisa Hari Prediction Model",
-    "version": "1.0.0",
-    "type": "regression",
-    "description": "Predicts remaining shelf life of fruits and vegetables",
-    "training_date": "2026-05-23"
-  },
-  "features": {
-    "categorical_features": [
-      {
-        "name": "nama_item",
-        "description": "Nama buah/sayur",
-        "encoder_classes": [
-          "Anggur",
-          "Apel",
-          "Cabe",
-          "Jeruk",
-          "Kentang",
-          "Mangga",
-          "Pisang",
-          "Timun",
-          "Tomat",
-          "Wortel"
-        ]
-      },
-      {
-        "name": "jenis_item",
-        "description": "Jenis item",
-        "encoder_classes": ["Buah", "Sayur"]
-      },
-      {
-        "name": "lokasi_penyimpanan",
-        "description": "Lokasi penyimpanan",
-        "encoder_classes": ["Pembeku", "Pendingin", "Suhu Ruang"]
-      },
-      {
-        "name": "label",
-        "description": "Kondisi fisik item",
-        "encoder_classes": [
-          "Busuk",
-          "Matang",
-          "Mentah",
-          "Segar",
-          "Terlalu Matang"
-        ]
-      }
+  "model_path": "model.keras",
+  "input_features": [
+    "nama_item",
+    "jenis_item",
+    "lokasi_penyimpanan",
+    "label",
+    "hari_sejak_pembelian",
+    "label_score",
+    "lokasi_mult",
+    "label_x_lokasi",
+    "hari_x_lokasi"
+  ],
+  "categorical_cols": [
+    "nama_item",
+    "jenis_item",
+    "lokasi_penyimpanan",
+    "label"
+  ],
+  "numerical_cols": [
+    "hari_sejak_pembelian",
+    "label_score",
+    "lokasi_mult",
+    "label_x_lokasi",
+    "hari_x_lokasi"
+  ],
+  "n_features": 9,
+  "encoder_classes": {
+    "nama_item": [
+      "Anggur",
+      "Apel",
+      "Cabe",
+      "Jeruk",
+      "Kentang",
+      "Mangga",
+      "Pisang",
+      "Timun",
+      "Tomat",
+      "Wortel"
     ],
-    "numeric_features": [
-      {
-        "name": "hari_sejak_pembelian",
-        "description": "Jumlah hari sejak pembelian",
-        "scaler_mean": -0.0004,
-        "scaler_scale": 0.8976
-      }
+    "jenis_item": [
+      "Buah",
+      "Sayur"
     ],
-    "feature_order": [
-      "nama_item",
-      "jenis_item",
-      "lokasi_penyimpanan",
-      "label",
-      "hari_sejak_pembelian"
+    "lokasi_penyimpanan": [
+      "Pembeku",
+      "Pendingin",
+      "Suhu Ruang"
+    ],
+    "label": [
+      "Busuk",
+      "Matang",
+      "Mentah",
+      "Segar",
+      "Terlalu Matang"
     ]
   },
-  "preprocessing": {
-    "categorical_encoding": "LabelEncoder",
-    "numeric_scaling": "StandardScaler"
+  "label_order_mapping": {
+    "Busuk": 0,
+    "Terlalu Matang": 1,
+    "Matang": 2,
+    "Segar": 3,
+    "Mentah": 4
   },
-  "model_parameters": {
-    "input_shape": 5,
-    "output_shape": 1,
-    "output_activation": "linear"
+  "lokasi_multiplier": {
+    "Suhu Ruang": 1.0,
+    "Pendingin": 1.8,
+    "Pembeku": 3.5
   },
-  "performance_metrics": {
-    "mae": 2.536,
-    "rmse": 3.659,
-    "r2": 0.879
+  "scaler_params": {
+    "center_": [
+      4.0,
+      0.0,
+      1.0,
+      1.0,
+      2.0,
+      2.0,
+      1.7999999523162842,
+      3.0,
+      3.5
+    ],
+    "scale_": [
+      5.0,
+      1.0,
+      2.0,
+      3.0,
+      2.0,
+      3.0,
+      2.5,
+      5.400000095367432,
+      4.400000095367432
+    ]
   },
-  "api_example": {
-    "endpoint": "/predict/regression",
-    "method": "POST",
-    "request_example": {
-      "nama_item": "Apel",
-      "jenis_item": "Buah",
-      "lokasi_penyimpanan": "Suhu Ruang",
-      "tanggal_beli": "2026-05-20",
-      "kondisi_fisik": "Matang"
-    },
-    "response_example": {
-      "estimasi_sisa_hari": 8
-    }
+  "upper_bound_lookup": {
+    "Anggur|Pembeku": 41.5,
+    "Anggur|Pendingin": 27.8,
+    "Anggur|Suhu Ruang": 13.4,
+    "Apel|Pembeku": 42.0,
+    "Apel|Pendingin": 32.4,
+    "Apel|Suhu Ruang": 16.6,
+    "Cabe|Pembeku": 41.2,
+    "Cabe|Pendingin": 29.9,
+    "Cabe|Suhu Ruang": 14.8,
+    "Jeruk|Pembeku": 41.9,
+    "Jeruk|Pendingin": 35.7,
+    "Jeruk|Suhu Ruang": 17.9,
+    "Kentang|Pembeku": 39.6,
+    "Kentang|Pendingin": 41.4,
+    "Kentang|Suhu Ruang": 20.8,
+    "Mangga|Pembeku": 41.4,
+    "Mangga|Pendingin": 24.5,
+    "Mangga|Suhu Ruang": 12.4,
+    "Pisang|Pembeku": 41.2,
+    "Pisang|Pendingin": 22.0,
+    "Pisang|Suhu Ruang": 11.2,
+    "Timun|Pembeku": 41.4,
+    "Timun|Pendingin": 26.9,
+    "Timun|Suhu Ruang": 13.2,
+    "Tomat|Pembeku": 42.0,
+    "Tomat|Pendingin": 23.9,
+    "Tomat|Suhu Ruang": 12.0,
+    "Wortel|Pembeku": 40.4,
+    "Wortel|Pendingin": 38.8,
+    "Wortel|Suhu Ruang": 19.2
+  },
+  "safety_cap_ratio": 0.92,
+  "training_info": {
+    "n_samples_original": 3723,
+    "n_samples_augmented": 11169,
+    "test_mae_raw_int": 2.3356,
+    "test_mae_safe_int": 2.3356,
+    "best_val_mae": 2.6599,
+    "noise_floor_est": 2.4875
   }
 }

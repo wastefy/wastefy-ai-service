@@ -13,9 +13,11 @@ inference.py
 test_api.py
 api_simple.py
 test_fastapi.py
+training_log.csv
 
 # folder 
 .ipynb_checkpoints/
 model_output/
 __pycache__/
 .vscode/
+artifacts/
