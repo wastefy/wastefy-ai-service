@@ -7,11 +7,11 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
-from model.schemas import (
+from schemas import (
     ErrorDetail, ErrorResponseWrapper,
     MetaInfo, SuccessResponse
 )
-from model.utils import get_now, load_model, verify_api_key
+from utils import get_now, load_model, verify_api_key
 
 router = APIRouter(prefix="/predict", tags=["Regression Model"])
 
@@ -28,7 +28,7 @@ class ModelInfo(BaseModel):
     version: str = "1.0.0"
 
 class InputRegresi(BaseModel):
-    nama_item: str = Field(..., description="Nama item: Anggur, Apel, dll")
+    nama_item: str = Field(..., description="Nama item: Anggur, Apel, Cabai, Jeruk, Kentang, Mangga, Mentimun, Pisang, Tomat, Wortel")
     jenis_item: str = Field(..., description="Jenis item: Buah, Sayur")
     lokasi_penyimpanan: str = Field(..., description="Lokasi penyimpanan: Suhu Ruang, Pendingin, Pembeku")
     tanggal_beli: str = Field(..., description="Format tanggal pembelian: YYYY-MM-DD")
