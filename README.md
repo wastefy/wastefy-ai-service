@@ -45,7 +45,8 @@ Isi file `.env`:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 WASTEFY_API_KEY=your_secret_api_key_here
-HF_TOKEN=your_huggingface_token_here
+HF_TOKEN_RIIMARU=your_huggingface_token_riimaru_here
+HF_TOKEN_ARCIII=your_huggingface_token_arciii_here
 ```
 
 ### 3. Jalankan Server
