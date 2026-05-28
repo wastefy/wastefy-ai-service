@@ -23,6 +23,11 @@ VALID_JENIS = ["Buah", "Sayur"]
 VALID_KONDISI = ["Busuk", "Matang", "Mentah", "Terlalu Matang", "Segar"]
 VALID_LOKASI = ["Suhu Ruang", "Pendingin", "Pembeku"]
 
+ITEM_ALIAS = {
+    "Mentimun": "Timun",
+    "Cabai": "Cabe"
+}
+
 class ModelInfo(BaseModel):
     name: str = "Regression Model"
     version: str = "1.0.0"
@@ -39,7 +44,7 @@ class InputRegresi(BaseModel):
     def validasi_item(cls, v):
         if v not in VALID_ITEM:
             raise ValueError(f'Item harus salah satu dari: {", ".join(VALID_ITEM)}')
-        return v
+        return ITEM_ALIAS.get(v, v)
 
     @field_validator('jenis_item')
     @classmethod
@@ -139,7 +144,9 @@ def apply_safe_prediction(pred_raw: float, nama_item: str, lokasi_penyimpanan: s
     safety_cap  = upper_bound * SAFETY_CAP_RATIO
 
     pred_clipped = float(np.clip(pred_raw, 0, safety_cap))
-    return int(round(pred_clipped))
+    result = int(round(pred_clipped))
+    
+    return max(0, min(40, result))
 
 
 # 4. CONTOH RESPONSES
