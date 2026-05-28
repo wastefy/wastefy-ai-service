@@ -16,22 +16,23 @@ download_models()
 from model.utils import get_now
 from model.schemas import ErrorResponseWrapper, ErrorDetail, MetaInfo
 from model.vision.api_vision import router as vision_router
-from model.genai.api_genai import router as genai_router
 from model.regression.api_regression import router as regression_router
-
+from model.genai.api_genai import router as genai_router
 app = FastAPI(
     title="Wastefy AI Services",
     version="1.0.0",
     description=textwrap.dedent("""\
-        Layanan AI untuk klasifikasi kondisi fisik sayur & buah dan panduan penyimpanannya.
+        Layanan AI untuk analisis kondisi sayur & buah, prediksi umur simpan, dan panduan penyimpanannya.
 
         **Modul tersedia:**
         - **POST** `/predict/vision` — Klasifikasi kondisi fisik sayur & buah
+        - **POST** `/predict/regression` — Prediksi estimasi umur simpan
         - **POST** `/predict/genai` — Panduan penyimpanan via Gemini AI
 
         **Format Response Standar:**
         ```json
         {
+            "status": "success" | "error",
             "code": 200,
             "data": { ... },
             "message": "Deskripsi dalam Bahasa Indonesia",
@@ -39,8 +40,7 @@ app = FastAPI(
                 "api": {"version": "1.0.0"},
                 "generated_at": "ISO 8601",
                 "model": {"name": "...", "version": "1.0.0"} | null
-            },
-            "status": "success | error"
+            }
         }
         ```
     """)
@@ -57,11 +57,11 @@ app.add_middleware(
 
 # Router
 app.include_router(vision_router)
-app.include_router(genai_router)
 app.include_router(regression_router)
+app.include_router(genai_router)
 
 # Root
-@app.get("/")
+@app.get("/", tags=["System"])
 async def root():
     return {
         "message": "API AI beroperasi dengan baik",
@@ -69,7 +69,7 @@ async def root():
     }
 
 # Health
-@app.get("/health")
+@app.get("/health", tags=["System"])
 async def health():
     return {"status": "ok"}
 

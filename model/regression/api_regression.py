@@ -70,7 +70,7 @@ class InputRegresi(BaseModel):
         return v
 
 class OutputRegresi(BaseModel):
-    estimasi_sisa_hari: int
+    sisa_hari: int
 
 # 2. LOAD MODEL & METADATA
 
@@ -154,9 +154,9 @@ REGRESSION_RESPONSES = {
                     "status": "success",
                     "code": 200,
                     "data": {
-                        "estimasi_sisa_hari": 3
+                        "sisa_hari": 3
                     },
-                    "message": "Estimasi sisa hari berhasil dihitung",
+                    "message": "Sisa hari berhasil dihitung",
                     "meta": {
                         "api": {"version": "1.0.0"},
                         "generated_at": "2026-05-24T02:00:00Z",
@@ -245,14 +245,14 @@ async def prediksi_sisa_hari(data: InputRegresi):
         )
 
         pred_raw = float(model.predict(X, verbose=0)[0][0])
-        estimasi_hari = apply_safe_prediction(pred_raw, data.nama_item, data.lokasi_penyimpanan)
+        sisa_hari = apply_safe_prediction(pred_raw, data.nama_item, data.lokasi_penyimpanan)
 
-        hasil_data = OutputRegresi(estimasi_sisa_hari=estimasi_hari)
+        hasil_data = OutputRegresi(sisa_hari=sisa_hari)
 
         return SuccessResponse(
             code=200,
             data=hasil_data,
-            message="Estimasi sisa hari berhasil dihitung",
+            message="Sisa hari berhasil dihitung",
             meta=MetaInfo(generated_at=waktu_sekarang, model=ModelInfo().model_dump()),
         )
 

@@ -18,5 +18,10 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
           git remote add space https://riimaru:$HF_TOKEN@huggingface.co/spaces/riimaru/wastefy-ai-service
-          git push space main --force
+          git checkout --orphan temp-deploy
+          git add .
+          git commit -m "deploy: latest commit"
+          git push space temp-deploy:main --force
