@@ -144,7 +144,9 @@ def apply_safe_prediction(pred_raw: float, nama_item: str, lokasi_penyimpanan: s
     safety_cap  = upper_bound * SAFETY_CAP_RATIO
 
     pred_clipped = float(np.clip(pred_raw, 0, safety_cap))
-    return int(round(pred_clipped))
+    result = int(round(pred_clipped))
+    
+    return max(0, min(40, result))
 
 
 # 4. CONTOH RESPONSES
