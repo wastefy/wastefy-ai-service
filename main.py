@@ -35,7 +35,7 @@ app = FastAPI(
         {
             "status": "success" | "error",
             "code": 200,
-            "data": { ... },
+            "data": { ... } | "errors": [ ... ],
             "message": "Deskripsi dalam Bahasa Indonesia",
             "meta": {
                 "api": {"version": "1.0.0"},
