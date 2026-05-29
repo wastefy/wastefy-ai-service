@@ -18,6 +18,7 @@ from model.schemas import ErrorResponseWrapper, ErrorDetail, MetaInfo
 from model.vision.api_vision import router as vision_router
 from model.regression.api_regression import router as regression_router
 from model.genai.api_genai import router as genai_router
+
 app = FastAPI(
     title="Wastefy AI Services",
     version="1.0.0",
@@ -34,7 +35,7 @@ app = FastAPI(
         {
             "status": "success" | "error",
             "code": 200,
-            "data": { ... },
+            "data": { ... } | "errors": [ ... ],
             "message": "Deskripsi dalam Bahasa Indonesia",
             "meta": {
                 "api": {"version": "1.0.0"},
@@ -55,11 +56,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Router
-app.include_router(vision_router)
-app.include_router(regression_router)
-app.include_router(genai_router)
-
 # Root
 @app.get("/", tags=["System"])
 async def root():
@@ -72,6 +68,11 @@ async def root():
 @app.get("/health", tags=["System"])
 async def health():
     return {"status": "ok"}
+
+# Router
+app.include_router(vision_router)
+app.include_router(regression_router)
+app.include_router(genai_router)
 
 # Handler 401
 @app.exception_handler(HTTPException)
