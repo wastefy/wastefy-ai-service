@@ -33,8 +33,8 @@ try:
     model, metadata = load_model("vision")
     
     CLASS_NAMES = metadata["class_names"]
-    CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.6)
-    ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 1.134)
+    CONFIDENCE_THRESHOLD = metadata.get("confidence_threshold", 0.7)
+    ENTROPY_THRESHOLD = metadata.get("entropy_threshold", 0.75)
 except Exception as e:
     model = None
     metadata = None
