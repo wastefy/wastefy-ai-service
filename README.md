@@ -1,6 +1,6 @@
 # Vision Model (Klasifikasi Kondisi Fisik Sayur & Buah)
 
-Modul FastAPI untuk mengklasifikasikan kondisi fisik sayur dan buah menggunakan model **MobileNetV2** yang dilatih dengan Transfer Learning (Feature Extraction).
+Modul FastAPI untuk mengklasifikasikan kondisi fisik sayur dan buah menggunakan model **MobileNetV2** yang dilatih dengan skema Transfer Learning (Feature Extraction dan Fine-Tuning).
 
 ---
 
@@ -15,7 +15,8 @@ model/vision/
 ├── model.keras             ← Model Keras
 ├── README.md               ← Dokumentasi API
 ├── requirements.txt        ← Daftar dependensi Python
-└── vision_model.ipynb      ← Notebook proses pelatihan
+├── vision_model.ipynb      ← Notebook proses pelatihan phase 1
+└── vision_model_ft.ipynb   ← Notebook proses pelatihan phase 2
 ```
 
 ---
@@ -24,12 +25,12 @@ model/vision/
 
 | Properti | Detail |
 |---|---|
-| Arsitektur | MobileNetV2 (pretrained ImageNet, frozen) |
+| Arsitektur | MobileNetV2 (Pre-trained ImageNet, Fine-Tuned 50 layer terakhir) |
 | Input | 224 × 224 × 3 RGB |
 | Jumlah Kelas | 30 |
 | Dataset (total) | 68.752 gambar (24.242 dipakai setelah undersampling cap 1.500/kelas) |
 | Item | Apel, Pisang, Mangga, Jeruk, Wortel, Kentang, Cabai, Anggur, Mentimun, Tomat |
-| Fase Training | Feature Extraction (1 fase) |
+| Fase Training | Fase 1 (Feature Extraction) & Fase 2 (Fine-Tuning) |
 | Augmentasi | On-the-fly (flip, crop, brightness, dll.) |
 
 ### Label Output
@@ -235,8 +236,8 @@ Untuk mencegah model menebak secara acak pada gambar yang bukan buah atau sayur,
 
 | Metrik Validasi | Nilai Default | Logika Penolakan |
 |---|---|---|
-| Confidence Threshold | `0.60` | Ditolak jika skor tertinggi < threshold |
-| Entropy Threshold | `1.134` | Ditolak jika probabilitas terlalu merata (bias) |
+| Confidence Threshold | `0.7` | Ditolak jika skor tertinggi < threshold |
+| Entropy Threshold | `0.75` | Ditolak jika probabilitas terlalu merata (bias) |
 
 Nilai ini tersimpan di `model_metadata.json` dan dibaca otomatis saat startup.
 
@@ -244,4 +245,4 @@ Nilai ini tersimpan di `model_metadata.json` dan dibaca otomatis saat startup.
 
 ## Training
 
-Notebook pelatihan lengkap: [`vision_model.ipynb`](vision_model.ipynb)
+Notebook pelatihan: [`vision_model.ipynb`](vision_model.ipynb) & [`vision_model_ft.ipynb`](vision_model_ft.ipynb) 

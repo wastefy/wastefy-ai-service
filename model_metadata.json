@@ -66,8 +66,8 @@
   "num_classes": 30,
   "img_size": 224,
   "label_format": "nama_item||jenis_item||kondisi_fisik",
-  "confidence_threshold": 0.6,
-  "entropy_threshold": 1.134,
+  "confidence_threshold": 0.7,
+  "entropy_threshold": 0.75,
   "entropy_uniform_30cls": 3.4011973816621555,
   "jenis_item": {
     "Buah": [
