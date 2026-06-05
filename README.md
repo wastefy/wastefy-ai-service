@@ -20,6 +20,19 @@ Entry point utama untuk seluruh layanan AI Wastefy berbasis FastAPI.
 
 ---
 
+## Tautan Model ML
+
+File model Machine Learning (.keras) yang digunakan pada layanan ini di-hosting secara eksternal melalui Google Drive. 
+
+Kamu dapat mengunduh model tersebut melalui tautan berikut:
+- **[Link Folder/File Google Drive Model Wastefy](https://drive.google.com/drive/folders/103FMAtQpZtU_tKAtlYGadvcRrnmh2n9W?usp=sharing)**
+
+*(Catatan: Akses untuk melihat dan mengunduh telah dibuka untuk akun `capstone@student.devacademy.id`)*
+
+Setelah diunduh, letakkan file model tersebut di dalam direktori yang sesuai (misalnya di dalam folder `model/vision/` atau `model/regression/`) sebelum menjalankan server.
+
+---
+
 ## Cara Pakai
 
 ### 1. Install Dependensi
